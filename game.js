@@ -22,6 +22,33 @@ class Game2048 {
         this.bestScoreElement = document.getElementById('best-score');
         this.newGameButton = document.getElementById('new-game');
 
+        // Tutorial Modal Functionality
+        const tutorialModal = document.getElementById('tutorial-modal');
+        const showTutorialBtn = document.getElementById('show-tutorial-btn');
+        const closeTutorialBtn = document.querySelector('.close-tutorial');
+        const startGameBtn = document.getElementById('start-game-btn');
+
+        function openTutorial() {
+            tutorialModal.style.display = 'block';
+        }
+
+        function closeTutorial() {
+            tutorialModal.style.display = 'none';
+        }
+
+        showTutorialBtn.addEventListener('click', openTutorial);
+        closeTutorialBtn.addEventListener('click', closeTutorial);
+        startGameBtn.addEventListener('click', () => {
+            closeTutorial();
+            new Game2048(); // Directly create a new game instance
+        });
+
+        // Show tutorial on first visit
+        if (!localStorage.getItem('tutorialShown')) {
+            openTutorial();
+            localStorage.setItem('tutorialShown', 'true');
+        }
+
         this.setupEventListeners();
         this.updateScoreDisplay();
         this.renderGrid();
