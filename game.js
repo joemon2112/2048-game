@@ -22,33 +22,6 @@ class Game2048 {
         this.bestScoreElement = document.getElementById('best-score');
         this.newGameButton = document.getElementById('new-game');
 
-        // Tutorial Modal Functionality
-        const tutorialModal = document.getElementById('tutorial-modal');
-        const showTutorialBtn = document.getElementById('show-tutorial-btn');
-        const closeTutorialBtn = document.querySelector('.close-tutorial');
-        const startGameBtn = document.getElementById('start-game-btn');
-
-        function openTutorial() {
-            tutorialModal.style.display = 'block';
-        }
-
-        function closeTutorial() {
-            tutorialModal.style.display = 'none';
-        }
-
-        showTutorialBtn.addEventListener('click', openTutorial);
-        closeTutorialBtn.addEventListener('click', closeTutorial);
-        startGameBtn.addEventListener('click', () => {
-            closeTutorial();
-            new Game2048(); // Directly create a new game instance
-        });
-
-        // Show tutorial on first visit
-        if (!localStorage.getItem('tutorialShown')) {
-            openTutorial();
-            localStorage.setItem('tutorialShown', 'true');
-        }
-
         this.setupEventListeners();
         this.updateScoreDisplay();
         this.renderGrid();
@@ -236,6 +209,34 @@ class Game2048 {
         this.closeModal();
     }
 
+    initGrid() {
+        // Reset the grid
+        this.grid = Array.from({ length: this.gridSize }, () => Array(this.gridSize).fill(0));
+        this.score = 0;
+        document.getElementById('score').textContent = this.score;
+        
+        // Clear existing grid display
+        const gridElement = document.getElementById('grid');
+        gridElement.innerHTML = '';
+        
+        // Recreate grid cells
+        for (let row = 0; row < this.gridSize; row++) {
+            for (let col = 0; col < this.gridSize; col++) {
+                const cell = document.createElement('div');
+                cell.classList.add('grid-cell');
+                cell.dataset.row = row;
+                cell.dataset.col = col;
+                gridElement.appendChild(cell);
+            }
+        }
+        
+        // Add initial tiles
+        this.initializeGrid();
+        
+        // Reattach event listeners
+        this.setupEventListeners();
+    }
+
     showModal(message, isWin) {
         const modal = document.createElement('div');
         modal.id = 'game-modal';
@@ -267,7 +268,90 @@ class Game2048 {
     }
 }
 
-// Initialize the game when the page loads
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
+    // Ensure tutorial modal is set up
+    const tutorialModal = document.getElementById('tutorial-modal');
+    const showTutorialBtn = document.createElement('button');
+    showTutorialBtn.id = 'show-tutorial-btn';
+    showTutorialBtn.textContent = 'チュートリアル';
+    showTutorialBtn.style.position = 'fixed';
+    showTutorialBtn.style.bottom = '20px';
+    showTutorialBtn.style.right = '20px';
+    showTutorialBtn.style.backgroundColor = '#4CAF50';
+    showTutorialBtn.style.color = 'white';
+    showTutorialBtn.style.border = 'none';
+    showTutorialBtn.style.padding = '10px 20px';
+    showTutorialBtn.style.borderRadius = '5px';
+    showTutorialBtn.style.cursor = 'pointer';
+    showTutorialBtn.style.fontSize = '16px';
+    showTutorialBtn.style.transition = 'background-color 0.3s ease';
+    showTutorialBtn.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+    showTutorialBtn.addEventListener('mouseover', () => {
+        showTutorialBtn.style.backgroundColor = '#45a049';
+    });
+    showTutorialBtn.addEventListener('mouseout', () => {
+        showTutorialBtn.style.backgroundColor = '#4CAF50';
+    });
+    document.body.appendChild(showTutorialBtn);
+
+    const closeTutorialBtn = document.querySelector('.close-tutorial');
+    const startGameBtn = document.getElementById('start-game-btn');
+
+    // Set up tutorial modal functionality
+    if (tutorialModal && showTutorialBtn && closeTutorialBtn && startGameBtn) {
+        showTutorialBtn.addEventListener('click', function() {
+            tutorialModal.style.display = 'block';
+        });
+
+        closeTutorialBtn.addEventListener('click', function() {
+            tutorialModal.style.display = 'none';
+        });
+
+        startGameBtn.addEventListener('click', function(event) {
+            event.preventDefault();
+            tutorialModal.style.display = 'none';
+            
+            // Clear existing grid
+            const gridElement = document.getElementById('grid');
+            if (gridElement) {
+                gridElement.innerHTML = '';
+            }
+            
+            // Start new game
+            new Game2048();
+        });
+
+        // Show tutorial on first visit
+        if (!localStorage.getItem('tutorialShown')) {
+            tutorialModal.style.display = 'block';
+            localStorage.setItem('tutorialShown', 'true');
+        }
+    } else {
+        console.error('One or more tutorial modal elements not found');
+    }
+
+    // Initialize the game
     new Game2048();
 });
+
+// Add tutorial button to the page
+function addTutorialButton() {
+    const tutorialBtn = document.createElement('button');
+    tutorialBtn.id = 'show-tutorial-btn';
+    tutorialBtn.textContent = 'チュートリアル';
+    document.body.appendChild(tutorialBtn);
+
+    tutorialBtn.addEventListener('click', () => {
+        const tutorialModal = document.getElementById('tutorial-modal');
+        tutorialModal.style.display = 'block';
+    });
+}
+
+// Initialize the game when the page loads
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        new Game2048();
+    });
+} else {
+    new Game2048();
+}
