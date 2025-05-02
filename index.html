@@ -23,5 +23,32 @@
         </div>
     </div>
     <script src="game.js"></script>
+  
+  <div id="tutorial-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-tutorial">&times;</span>
+      <h2>2048ゲームチュートリアル</h2>
+      <div class="tutorial-section">
+        <h3>ゲームの目的</h3>
+        <p>同じ数字のタイルを合わせて、2048のタイルを作ることが目標です。</p>
+      </div>
+      <div class="tutorial-section">
+        <h3>操作方法</h3>
+        <ul>
+          <li>矢印キー（↑、↓、←、→）でタイルを移動</li>
+          <li>同じ数字のタイルが衝突すると、数字が2倍になります</li>
+          <li>盤面に空きがなくなったらゲームオーバー</li>
+        </ul>
+      </div>
+      <div class="tutorial-section">
+        <h3>勝利条件</h3>
+        <p>2048のタイルを作ったら勝利！さらに高得点を目指しましょう。</p>
+      </div>
+      <button id="start-game-btn">ゲームスタート</button>
+    </div>
+  </div>
+
+  <button id="show-tutorial-btn">チュートリアル</button>
+
 </body>
 </html>
