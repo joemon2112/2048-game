@@ -35,6 +35,9 @@ class Game2048 {
         );
         this.gameContainer.innerHTML = '';
         this.gameContainer.style.gridTemplateColumns = `repeat(${this.gridSize}, 1fr)`;
+        this.spawnTile();
+        this.spawnTile();
+        this.renderGrid();
     }
 
     setupEventListeners() {
@@ -75,7 +78,9 @@ class Game2048 {
             for (let c = 0; c < this.gridSize; c++) {
                 const tileValue = this.grid[r][c];
                 const tileElement = document.createElement('div');
-                tileElement.classList.add('tile');
+                tileElement.classList.add('grid-cell');
+                tileElement.dataset.row = r;
+                tileElement.dataset.col = c;
                 
                 if (tileValue !== 0) {
                     tileElement.textContent = tileValue;
@@ -237,27 +242,59 @@ class Game2048 {
         this.setupEventListeners();
     }
 
-    showModal(message, isWin) {
-        const modal = document.createElement('div');
-        modal.id = 'game-modal';
-        modal.classList.add('modal');
-        modal.classList.add(isWin ? 'win' : 'lose');
+    // Rotate grid for different move directions
+    rotateGrid(direction) {
+        let rotated = JSON.parse(JSON.stringify(this.grid));
+        
+        switch(direction) {
+            case 'left':
+                return rotated;
+            case 'right':
+                return rotated.map(row => row.reverse());
+            case 'up':
+                return rotated[0].map((_, colIndex) => rotated.map(row => row[colIndex]).reverse());
+            case 'down':
+                return rotated[0].map((_, colIndex) => rotated.map(row => row[colIndex]));
+        }
+    }
 
-        const modalContent = document.createElement('div');
-        modalContent.classList.add('modal-content');
+    // Add visual feedback for tile merging
+    addMergeTileEffect(row, col) {
+        const gridElement = document.getElementById('grid');
+        const cell = gridElement.querySelector(`[data-row='${row}'][data-col='${col}']`);
+        if (cell) {
+            cell.classList.add('merge');
+            setTimeout(() => {
+                cell.classList.remove('merge');
+            }, 300);
+        }
+    }
 
-        const modalMessage = document.createElement('h2');
-        modalMessage.textContent = message;
+    // Add score popup effect
+    showScorePopup(score, row, col) {
+        const gridElement = document.getElementById('grid');
+        const popup = document.createElement('div');
+        popup.classList.add('score-popup');
+        popup.textContent = `+${score}`;
+        
+        const cell = gridElement.querySelector(`[data-row='${row}'][data-col='${col}']`);
+        if (cell) {
+            const rect = cell.getBoundingClientRect();
+            popup.style.left = `${rect.left + rect.width / 2}px`;
+            popup.style.top = `${rect.top}px`;
+            document.body.appendChild(popup);
 
-        const restartButton = document.createElement('button');
-        restartButton.textContent = '新しいゲーム';
-        restartButton.addEventListener('click', () => this.resetGame());
+            setTimeout(() => {
+                document.body.removeChild(popup);
+            }, 1000);
+        }
+    }
 
-        modalContent.appendChild(modalMessage);
-        modalContent.appendChild(restartButton);
-        modal.appendChild(modalContent);
-
-        document.body.appendChild(modal);
+    // Merge tiles with visual feedback
+    mergeTiles(row, col, newValue) {
+        this.grid[row][col] = newValue;
+        this.score += newValue;
+        document.getElementById('score').textContent = this.score;
     }
 
     closeModal() {
